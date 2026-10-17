@@ -464,4 +464,14 @@ can break is a cup, never the whole set.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). 
+
+## Additional notes
+
+While the program is named **gitgud**, it is **NOT** in any way related to the [GitGud Project](https://github.com/GitGud-org/GitGud).
+
+However, it is compatible with other "Git Ops" workflows (as described by Gitlab on this [page](https://about.gitlab.com/topics/gitops/gitops-workflow/)  in general. 
+
+You may incorporate the journal method into your own workflow or modify the source code to better suit your specific requirements.
+
+
