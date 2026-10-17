@@ -23,6 +23,17 @@ go build ./cmd/gitgud
 
 The same four steps run in CI.
 
+## Git hooks
+
+An optional `pre-commit` hook in `.githooks/` runs `gofmt`, `go vet` and
+`go test` before each commit. Enable it once after cloning:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+It needs nothing beyond Go and git. CI runs the same checks either way.
+
 ## Scope
 
 The MVP covers `init`, `new` (feature, fix, release), `record`, `finish`

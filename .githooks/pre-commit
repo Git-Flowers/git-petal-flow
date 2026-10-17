@@ -1,0 +1,15 @@
+#!/bin/sh
+# Same gates as CI, minus build. Fails the commit on the first problem.
+# Enable once per clone: git config core.hooksPath .githooks
+set -e
+# git exports GIT_INDEX_FILE and friends to hooks; they would leak into the
+# temp repos the tests create and break them.
+for v in $(git rev-parse --local-env-vars); do unset "$v"; done
+unformatted="$(gofmt -l .)"
+if [ -n "$unformatted" ]; then
+  echo "gofmt: these files need formatting (run 'gofmt -w .'):" >&2
+  echo "$unformatted" >&2
+  exit 1
+fi
+go vet ./...
+go test -count=1 ./...
