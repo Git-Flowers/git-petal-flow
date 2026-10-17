@@ -37,6 +37,44 @@ go build -o bin/gitgud ./cmd/gitgud
 
 Put `bin/gitgud` on your `PATH`. Run `gitgud --version` to check it.
 
+On Linux (x86_64), you can instead install the released binary into
+`~/.local/bin` with the command below. It fetches `gitgud` only, not
+`gitgud-mcp`, and `-f` makes curl fail loudly on a 404 instead of feeding an
+error page to `tar`:
+
+```sh
+mkdir -p ~/.local/bin && curl -fL https://github.com/Git-Flowers/git-petal-flow/releases/download/v1.1.1/gitgud_1.1.1_linux_amd64.tar.gz | tar -xz -C ~/.local/bin --strip-components=1 gitgud_1.1.1_linux_amd64/gitgud
+```
+
+Most Ubuntu and WSL setups already put `~/.local/bin` on the trail the
+moment a new login shell opens, so you'll usually never need to touch the
+script. Only saddle up `scripts/update_paths.sh` if `gitgud` still ain't found
+after you open a fresh terminal. It adds `~/.local/bin` to `PATH` in your
+`~/.bashrc` (and `~/.zshrc` for zsh users), and it's safe to run twice, so
+don't sweat it. `scripts/update_paths.sh check` tells you where `gitgud`
+resolves, and exits 1 if the trail's still cold.
+
+**Ubuntu and WSL:** Ubuntu's `~/.profile` already adds `~/.local/bin` at login
+once the directory exists, so the script is often redundant. It also misses
+login shells that don't source `~/.bashrc`.
+
+Or install from a checkout with the script, which needs only bash and Go:
+
+```sh
+scripts/install.sh install    # go install gitgud and gitgud-mcp, link the Claude skill
+```
+
+The binaries land in `GOBIN`, or `$(go env GOPATH)/bin` (usually `~/go/bin`) if
+that is unset. Add that directory to your `PATH` if it is not there already
+(the script warns when it is missing):
+
+```sh
+export PATH="$(go env GOPATH)/bin:$PATH"
+```
+
+To also register the MCP server with Claude Code, run `scripts/install.sh all`.
+See [Use from Claude Code](#use-from-claude-code-mcp-and-skill).
+
 ## Basic usage
 
 Run these inside a git repository that has at least one commit.

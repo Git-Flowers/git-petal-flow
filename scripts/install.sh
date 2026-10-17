@@ -57,6 +57,11 @@ do_install() {
 		ln -s "$skill_src" "$skill_dst"
 	fi
 	log "linked skill: $skill_dst -> $skill_src"
+	case ":$PATH:" in
+	*":$(bin_dir):"*) ;;
+	*) log "note: $(bin_dir) is not on your PATH; add it so 'gitgud' is found:"
+	   log "  export PATH=\"$(bin_dir):\$PATH\"" ;;
+	esac
 	log "installed. Run '$0 register' to add the MCP server to Claude Code."
 }
 

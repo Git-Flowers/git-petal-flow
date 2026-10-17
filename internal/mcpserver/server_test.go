@@ -167,10 +167,26 @@ func TestRunnerFailureIsToolError(t *testing.T) {
 	}
 }
 
+// clearRepoEnv drops the variables git exports to hooks, so tests that run
+// under a pre-commit hook still talk to their own temp repos.
+func clearRepoEnv(t *testing.T) {
+	t.Helper()
+	for _, k := range []string{
+		"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+		"GIT_PREFIX", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+	} {
+		if v, ok := os.LookupEnv(k); ok {
+			os.Unsetenv(k)
+			t.Cleanup(func() { os.Setenv(k, v) })
+		}
+	}
+}
+
 // End to end through the real CLI, in a temp repo. Nothing touches the real
 // repository.
 func TestEndToEndThroughCLI(t *testing.T) {
 	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
+	clearRepoEnv(t)
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
 	t.Setenv("GIT_AUTHOR_NAME", "Test")
 	t.Setenv("GIT_AUTHOR_EMAIL", "test@example.invalid")
