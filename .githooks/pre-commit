@@ -1,15 +1,24 @@
 #!/bin/sh
-# Same gates as CI, minus build. Fails the commit on the first problem.
+# Fast local gate: only runs when Go files are staged, formats only those
+# files, and lets the Go test cache skip packages that did not change.
+# CI runs the full set (gofmt, vet, test, build) on every push.
 # Enable once per clone: git config core.hooksPath .githooks
 set -e
+staged="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.go$|^go\.(mod|sum)$' || true)"
+[ -n "$staged" ] || exit 0
+
 # git exports GIT_INDEX_FILE and friends to hooks; they would leak into the
 # temp repos the tests create and break them.
 for v in $(git rev-parse --local-env-vars); do unset "$v"; done
-unformatted="$(gofmt -l .)"
-if [ -n "$unformatted" ]; then
-  echo "gofmt: these files need formatting (run 'gofmt -w .'):" >&2
-  echo "$unformatted" >&2
-  exit 1
+
+gofiles="$(echo "$staged" | grep '\.go$' || true)"
+if [ -n "$gofiles" ]; then
+  unformatted="$(echo "$gofiles" | xargs gofmt -l)"
+  if [ -n "$unformatted" ]; then
+    echo "gofmt: these files need formatting (run 'gofmt -w <file>'):" >&2
+    echo "$unformatted" >&2
+    exit 1
+  fi
 fi
 go vet ./...
-go test -count=1 ./...
+go test ./...
