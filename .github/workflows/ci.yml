@@ -16,6 +16,10 @@ jobs:
       - name: tools
         run: apk add --no-cache git nodejs
       - uses: actions/checkout@v4
+      # The container user differs from the checkout owner; without this git
+      # refuses the repo and `go build` fails stamping VCS info.
+      - name: trust workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: gofmt
         run: test -z "$(gofmt -l .)"
       - name: vet
