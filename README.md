@@ -6,7 +6,7 @@ JSONL journal of the commits on each branch so the history can be read with
 `jq` or any other line-oriented tool. Release branches are available too, for
 teams that cut releases that way.
 
-GitHero-flow is not a replacement for git. Every operation is a plain `git` command
+Git-petal-flow is not a replacement for git. Every operation is a plain `git` command
 underneath, and the git history is the source of truth.
 
 ## Name
@@ -93,7 +93,7 @@ gitgud new fix "readline from user"      # fix/readline-from-user from develop
 gitgud new feature "epic-001/login validation" --parent epic/001-auth   # feature/epic-001/login-validation
 ```
 
-Leave out the description and GitHero-flow asks for one. The description becomes
+Leave out the description and Git-petal-flow asks for one. The description becomes
 the branch slug: `readline from user` gives `fix/readline-from-user`.
 
 ### Work and record
@@ -118,7 +118,7 @@ gitgud finish --delete    # the same, then delete the branch
 ```
 
 `finish` refuses on a dirty tree (uncommitted or untracked files) and on a
-branch that GitHero-flow did not create.
+branch that Git-petal-flow did not create.
 
 ### Release
 
@@ -133,7 +133,7 @@ The version must be `MAJOR.MINOR.PATCH`, with no `v` prefix and no suffix.
 ### Epics
 
 An epic groups related features and fixes. Its children are the branches
-GitHero-flow created with `--parent epic/<name>`.
+Git-petal-flow created with `--parent epic/<name>`.
 
 ```sh
 gitgud new epic "001 auth"                                  # epic/001-auth from develop
@@ -151,22 +151,22 @@ gitgud finish             # merge epic/001-auth into develop with --no-ff
 
 #### How the epic knows its children
 
-The epic has no list of children in git. The link is stored in GitHero-flow's
+The epic has no list of children in git. The link is stored in Git-petal-flow's
 `state.json` (see "Beneath the ceramic hood"): every branch records its
 `parent` when `gitgud new` creates it, and every branch records a `status` of
-`open` or `finished`. When you run `finish` on an epic, GitHero-flow looks through
+`open` or `finished`. When you run `finish` on an epic, Git-petal-flow looks through
 `state.json` for branches whose parent is that epic and whose status is still
 `open`. The git history of the children is not consulted.
 
 Two consequences follow:
 
 - **A child must be created with `gitgud new --parent`.** A branch made with
-  plain git (`git checkout -b feature/x epic/001-auth`) is not recorded, so GitHero-flow
+  plain git (`git checkout -b feature/x epic/001-auth`) is not recorded, so Git-petal-flow
   does not know it is a child and the epic will not wait for it.
 - **Only `gitgud finish` closes a child.** The status changes to `finished`
   when the child is finished, not when git merges it. If you delete an open
   child branch with plain git, its entry stays `open` in `state.json` and the
-  epic keeps refusing. GitHero-flow has no command for abandoning a child yet.
+  epic keeps refusing. Git-petal-flow has no command for abandoning a child yet.
 
 When a child is still open, `finish` refuses and names it:
 
@@ -188,7 +188,7 @@ carries that information:
 2. **Put the epic's identifier first in every child.** The child is
    `feature/epic-001/<name>` or `fix/epic-001/<name>`, with the same number.
 3. **Create the child with the matching `--parent`.** The name is a hint for
-   people. The `--parent` flag is what GitHero-flow records:
+   people. The `--parent` flag is what Git-petal-flow records:
 
    ```sh
    gitgud new feature "epic-001/some child feature" --parent epic/001-some-epic
@@ -207,7 +207,7 @@ Slashes are kept, so `feature/epic-001/some-child-feature` is created exactly
 as written. Each part of a name is lowercased and cleaned on its own, so
 `epic-001/Some Child!` becomes `epic-001/some-child`.
 
-GitHero-flow warns when a name does not follow the convention. If a child is created
+Git-petal-flow warns when a name does not follow the convention. If a child is created
 with the wrong or missing number, `new` prints a hint with the suggested name
 and still creates the branch:
 
@@ -215,7 +215,7 @@ and still creates the branch:
 hint: fix/login is a child of epic/001-some-epic; name it fix/epic-001/login so people can see the epic from the branch name
 ```
 
-The naming rule is a convention, not a check. GitHero-flow does not reject a child
+The naming rule is a convention, not a check. Git-petal-flow does not reject a child
 whose name does not match its parent, and `finish` ignores names entirely. The
 `--parent` flag decides the link.
 
@@ -285,7 +285,7 @@ for the fields and more `jq` recipes.
 | `epic/*`    | `develop`    | `develop`, once no child is open |
 | `release/*` | `develop`    | `main` (tagged `vX.Y.Z`), then `develop` |
 
-Every merge uses `--no-ff`. GitHero-flow never rebases, never fast-forwards and
+Every merge uses `--no-ff`. Git-petal-flow never rebases, never fast-forwards and
 never pushes.
 
 ## Commands
@@ -320,11 +320,11 @@ gitgud log --branch fix/readline-from-user | jq -c .
   files, or when a merge is in progress.
 - A merge that conflicts is left in progress and recorded in the journal. Resolve
   the files and commit them on the target branch (`develop`, or `main` for a
-  release). Then check out your branch and run `gitgud finish` again. GitHero-flow
+  release). Then check out your branch and run `gitgud finish` again. Git-petal-flow
   never aborts or resets a merge. See "Resolving a conflict" below.
 - Only branches created by `gitgud new` can be finished.
 
-## Where GitHero-flow keeps its data
+## Where Git-petal-flow keeps its data
 
 Inside the git directory, so nothing extra is committed:
 
@@ -355,13 +355,13 @@ and links `skills/gitgud` into `$CLAUDE_HOME/skills` (default `~/.claude`).
 too. Run `scripts/install.sh check` for the CI gate. The script needs only
 bash, Go, and the `claude` CLI for `register`.
 
-The server speaks MCP over stdio. It runs GitHero-flow with argument lists, never
+The server speaks MCP over stdio. It runs Git-petal-flow with argument lists, never
 through a shell, and it never prompts: `gitgud_new` needs a description or a
 version up front.
 
 ## Status line
 
-`gitgud statusline` prints one line about the GitHero-flow flow for Claude Code's
+`gitgud statusline` prints one line about the Git-petal-flow flow for Claude Code's
 status bar: the current branch, its parent, how many commits are recorded and
 how many are not yet, the last journal event, or the merge that is waiting on
 you. It prints nothing outside a git repo.
@@ -374,14 +374,14 @@ It only reads. It never changes the repository or the journal, and it always
 exits 0, so a problem can't show as an error in the bar. Set `NO_COLOR=1` to
 turn off the colours.
 
-## Asking Claude about GitHero-flow
+## Asking Claude about Git-petal-flow
 
 Claude can't see the status bar, because it isn't part of the conversation. To
 get the same information, ask Claude and it will run one of these:
 
 - **Current state:** "what's the gitgud status?" Claude runs `gitgud statusline`
   in the repo and reports the line it prints.
-- **Recent activity:** "what GitHero-flow activity happened recently?" Claude runs
+- **Recent activity:** "what Git-petal-flow activity happened recently?" Claude runs
   `gitgud log --limit 10` and summarises the events.
 - **Branch:** "what branch are we on?" Claude runs `git branch --show-current`.
 
@@ -404,8 +404,8 @@ run from.
 
 ## Beneath the ceramic hood
 
-The short version: GitHero-flow never stores history itself. Git stores the commits,
-and GitHero-flow keeps a small side ledger of which commits it has seen, which
+The short version: Git-petal-flow never stores history itself. Git stores the commits,
+and Git-petal-flow keeps a small side ledger of which commits it has seen, which
 branch made them, and what happened to each branch. This section walks through
 how that works, so nothing about it is a mystery.
 
@@ -462,7 +462,7 @@ the merge commit's SHA and journals it:
 
 - `merged`: a clean merge, with the merge commit SHA.
 - `merge.conflict`: git stopped, so the file list is journaled, the merge is
-  left in progress, and the process exits 2. GitHero-flow never runs `merge --abort`
+  left in progress, and the process exits 2. Git-petal-flow never runs `merge --abort`
   or `reset`. Resolving the conflict is git's job.
 - `branch.finished`: the last record for the branch. `state.json` is updated to
   `status: "finished"` only after this line is written.
