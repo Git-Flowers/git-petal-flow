@@ -1,4 +1,4 @@
-# GitHero-flow
+# Git Petal Flow
 
 A small workflow layer over `git`. It creates feature, fix and epic branches
 with the right parent, merges them back with `--no-ff`, and keeps a per-branch
@@ -11,9 +11,11 @@ underneath, and the git history is the source of truth.
 
 ## Name
 
-GitHero-flow was formerly called **gitgud**. It was renamed to match what it
+Git Petal flow  was formerly called **gitgud**. It was renamed to match what it
 does: it is not GitFlow, and it does not follow GitFlow's conventions or its
-feature set. The workflow has three branch types:
+feature set. This is why the cli is **gitgud** and **not git-petal-flow**. 
+
+The workflow has three branch types:
 
 - **feature** for new work, branched from `develop`.
 - **fix** for bug fixes, also branched from `develop`. There is no hotfix
