@@ -500,6 +500,18 @@ The record format is in [docs/journal-format.md](docs/journal-format.md).
 Nothing under here is fine china. The journal is plain text, so the worst you
 can break is a cup, never the whole set.
 
+## References
+
+Background reading on the branching model this project departs from:
+
+- [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/),
+  Vincent Driessen's original write-up of GitFlow.
+- [git-flow](https://github.com/nvie/gitflow), the original set of git
+  extensions that implements that model.
+- [git-flow-next](https://github.com/gittower/git-flow-next), the successor to
+  git-flow: a modern reimplementation in Go that stays backward compatible with
+  the original git-flow and git-flow-avh.
+
 ## License
 
 MIT. See [LICENSE](LICENSE). 
