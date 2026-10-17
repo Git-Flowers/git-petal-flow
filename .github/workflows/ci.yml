@@ -11,15 +11,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container: golang:1.26.8-alpine
+    env:
+      GOCACHE: /go-cache/build
+      GOMODCACHE: /go-cache/mod
     steps:
-      # The alpine image has no git (tests need it) and no node (checkout needs it).
+      # The alpine image has no git (tests need it), no node (checkout needs it)
+      # and only busybox tar (actions/cache needs GNU tar and zstd).
       - name: tools
-        run: apk add --no-cache git nodejs
+        run: apk add --no-cache git nodejs tar zstd
       - uses: actions/checkout@v4
       # The container user differs from the checkout owner; without this git
       # refuses the repo and `go build` fails stamping VCS info.
       - name: trust workspace
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - uses: actions/cache@v4
+        with:
+          path: /go-cache
+          key: go-alpine-${{ hashFiles('go.sum') }}-${{ github.sha }}
+          restore-keys: |
+            go-alpine-${{ hashFiles('go.sum') }}-
       - name: gofmt
         run: test -z "$(gofmt -l .)"
       - name: vet
