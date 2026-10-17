@@ -37,6 +37,23 @@ go build -o bin/gitgud ./cmd/gitgud
 
 Put `bin/gitgud` on your `PATH`. Run `gitgud --version` to check it.
 
+Or install from a checkout with the script, which needs only bash and Go:
+
+```sh
+scripts/install.sh install    # go install gitgud and gitgud-mcp, link the Claude skill
+```
+
+The binaries land in `GOBIN`, or `$(go env GOPATH)/bin` (usually `~/go/bin`) if
+that is unset. Add that directory to your `PATH` if it is not there already
+(the script warns when it is missing):
+
+```sh
+export PATH="$(go env GOPATH)/bin:$PATH"
+```
+
+To also register the MCP server with Claude Code, run `scripts/install.sh all`.
+See [Use from Claude Code](#use-from-claude-code-mcp-and-skill).
+
 ## Basic usage
 
 Run these inside a git repository that has at least one commit.
