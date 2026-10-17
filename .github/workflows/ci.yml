@@ -10,8 +10,11 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: golang:1.26.8-bookworm
+    container: golang:1.26.8-alpine
     steps:
+      # The alpine image has no git (tests need it) and no node (checkout needs it).
+      - name: tools
+        run: apk add --no-cache git nodejs
       - uses: actions/checkout@v4
       - name: gofmt
         run: test -z "$(gofmt -l .)"
